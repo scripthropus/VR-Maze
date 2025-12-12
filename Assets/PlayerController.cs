@@ -1,40 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class PlayerController : MonoBehaviour
 {
     [Header("移動")]
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float gravity = -9.81f;
+    public float moveSpeed = 5f;
 
     [Header("参照")]
-    [SerializeField] private Transform cameraTransform;
+    public Transform cameraTransform;
 
     [Header("モード")]
-    [SerializeField] private bool isPCMode = false;
-    [SerializeField] private float mouseSensitivity = 2f;
+    public bool isPCMode = true;
+    public float mouseSensitivity = 2f;
 
-    private CharacterController controller;
-    private Vector3 velocity;
+    private Rigidbody rb;
     private float xRotation = 0f;
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+
+        // Rigidbodyの設定を強制
+        rb.useGravity = true;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
 
         if (isPCMode)
+        {
             Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     void Update()
     {
         if (isPCMode)
+        {
             MouseLook();
+        }
 
         Move();
-        ApplyGravity();
     }
 
     void MouseLook()
@@ -42,8 +47,10 @@ public class PlayerController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
+        // Y軸回転（左右を向く）
         transform.Rotate(Vector3.up * mouseX);
 
+        // X軸回転（上下を見る）
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
@@ -51,26 +58,28 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        // 入力を取得
+        float horizontal = Input.GetAxis("Horizontal"); // A/D
+        float vertical = Input.GetAxis("Vertical");     // W/S
 
+        // カメラの向きを基準に移動方向を計算
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
+
+        // Y成分を0にして水平移動のみ（これが重要！）
         forward.y = 0;
         right.y = 0;
         forward.Normalize();
         right.Normalize();
 
-        Vector3 moveDir = right * x + forward * z;
-        controller.Move(moveDir * moveSpeed * Time.deltaTime);
-    }
+        // 移動ベクトルを計算
+        Vector3 moveDirection = forward * vertical + right * horizontal;
 
-    void ApplyGravity()
-    {
-        if (controller.isGrounded && velocity.y < 0)
-            velocity.y = -2f;
-
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        // 速度を設定（X, Z のみ。Y は重力に任せる）
+        rb.velocity = new Vector3(
+            moveDirection.x * moveSpeed,
+            rb.velocity.y,  // 重力を保持
+            moveDirection.z * moveSpeed
+        );
     }
 }
