@@ -7056,6 +7056,7 @@ GameObject:
   - component: {fileID: 2090716884}
   - component: {fileID: 2090716883}
   - component: {fileID: 2090716887}
+  - component: {fileID: 2090716888}
   m_Layer: 0
   m_Name: PlaneMap
   m_TagString: Untagged
@@ -7158,13 +7159,27 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2090716882}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 837bbd9842ade7742952f1a1109a8c10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   plane: {fileID: 2090716882}
   spacing: 0.3
+--- !u!114 &2090716888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090716882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de7f98af58030c447a3511d5e1652c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTransform: {fileID: 1672250147}
+  heightOffset: 10
 --- !u!1 &1000012649002979
 GameObject:
   m_ObjectHideFlags: 0
